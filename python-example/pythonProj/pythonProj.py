@@ -9,5 +9,6 @@ def printme( str ):
     return;
 
 # Now you can call printme function
-printme('Sample output: %s, %s, %s' % (str(sys.argv[1]), str(sys.argv[2]), str(sys.argv[3])))
 printme("Hello from Python Project");
+printme('The parameterized output is %s \n The project url is %s \n the current build id is %s' % (str(sys.argv[1]), str(sys.argv[2]), str(sys.argv[3])))
+
