@@ -1,0 +1,78 @@
+#!/usr/bin/env groovy
+ 
+import hudson.model.*
+import hudson.EnvVars
+import groovy.json.JsonSlurperClassic
+import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
+import java.net.URL
+
+try {
+    
+node('java8') {
+
+  stage('Checkout') {
+    git 'https://github.com/vathsalahn/jenkins-demo.git'
+    
+  }
+
+  stage('Build') {
+      dir('MavenProject') {
+        sh 'mvn -B -V -U -e clean package'
+    }
+  }
+
+  stage('Archive') {
+    archiveArtifacts 'MavenProject/multi1/target/*.jar'
+  }
+  
+  stage('RePorts'){
+      parallel(
+        'findbugs': {
+                dir('MavenProject') {
+                sh 'mvn findbugs:findbugs test javancss:report'
+                findbugs()
+                }
+            },
+        'cobertura': {
+                    dir('MavenProject') {
+                    sh 'mvn cobertura:cobertura -Dcobertura.report.format=xml'
+                    cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '**/target/site/cobertura/coverage.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+            }
+    }
+    )
+  }
+stage ('Email') {
+    emailext attachLog: true, body: 'The status of the build is can be obtained from the build log attached', subject: 'The build update is ', to: '${email_to}'
+}
+stage('Deployment') {
+            // Deployment
+                script {
+                    echo "deployment"
+                    sh 'cp MavenProject/multi3/target/*.war /Applications/apache-tomcat-7.0.88/webapps/'
+            }
+        }
+        stage('publish html report') {
+                echo "publishing the html report"
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '', reportFiles: 'index.html', reportName: 'HTML Report', reportTitles: ''])
+        }
+        stage('clean up') {
+                echo "cleaning up the workspace"
+                cleanWs()
+        }
+}// node
+} // try end
+finally {
+    
+  
+ (currentBuild.result != "ABORTED") && node("master") {
+     // Send e-mail notifications for failed or unstable builds.
+     // currentBuild.result must be non-null for this step to work.
+     step([$class: 'Mailer',
+        notifyEveryUnstableBuild: true,
+        recipients: "${email_to}",
+        sendToIndividuals: true])
+ }
+ 
+
+}
