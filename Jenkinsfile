@@ -27,7 +27,7 @@ pipeline {
             steps {
                 script {
                     echo "deployment"
-                    sh 'cp MavenProject/multi3/target/*.war /var/lib/jenkins/tomcat8/webapps/'
+                    sh 'cp MavenProject/multi3/target/*.war /var/lib/tomcat8/webapps/'
                 }
             }
         }
