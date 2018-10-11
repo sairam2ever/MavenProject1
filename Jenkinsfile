@@ -4,7 +4,7 @@ pipeline {
         stage('Clone') {
             steps {
                 echo "checking out the repo"
-                git 'https://github.com/vathsalahn/jenkins-demo.git'
+                git 'https://github.com/edureka-devops/jenkins-demo.git'
             
             }
         }
@@ -27,7 +27,7 @@ pipeline {
             steps {
                 script {
                     echo "deployment"
-                    sh 'cp MavenProject/multi3/target/*.war /Applications/apache-tomcat-7.0.88/webapps/'
+                    sh 'cp MavenProject/multi3/target/*.war /var/lib/jenkins/tomcat8/webapps/'
                 }
             }
         }
@@ -48,14 +48,14 @@ pipeline {
             parallel ( "JavaNcss Report":   
             {
               node('window'){
-                git 'https://github.com/vathsalahn/jenkins-demo.git'
+                git 'https://github.com/edureka-devops/jenkins-demo.git'
                 sh "cd javancss-master ; mvn test javancss:report ; pwd"
                   }
             },
             "FindBugs Report" : {
             node('window'){
                 sh "mkdir javancss1 ; cd javancss1 ;pwd"
-                git 'https://github.com/vathsalahn/jenkins-demo.git'
+                git 'https://github.com/edureka-devops/jenkins-demo.git'
                 sh "cd javancss-master ; mvn findbugs:findbugs ; pwd"
                 deleteDir()
                 }
