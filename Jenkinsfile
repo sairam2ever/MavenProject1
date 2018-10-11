@@ -47,13 +47,13 @@ pipeline {
             steps{
             parallel ( "JavaNcss Report":   
             {
-              node('Jenkins'){
+              node('edureka-VirtualBox'){
                 git 'https://github.com/edureka-devops/jenkins-demo.git'
                 sh "cd javancss-master ; mvn test javancss:report ; pwd"
                   }
             },
             "FindBugs Report" : {
-              node('Jenkins'){
+              node('edureka-VirtualBox'){
                 sh "mkdir javancss1 ; cd javancss1 ;pwd"
                 git 'https://github.com/edureka-devops/jenkins-demo.git'
                 sh "cd javancss-master ; mvn findbugs:findbugs ; pwd"
