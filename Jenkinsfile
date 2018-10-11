@@ -47,7 +47,7 @@ pipeline {
             steps{
             parallel ( "JavaNcss Report":   
             {
-              node('window'){
+              node{
                 git 'https://github.com/edureka-devops/jenkins-demo.git'
                 sh "cd javancss-master ; mvn test javancss:report ; pwd"
                   }
