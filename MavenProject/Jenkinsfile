@@ -5,7 +5,10 @@ pipeline {
             steps {
                 echo "checking out the repo"
                 git 'https://github.com/vathsalahn/jenkins-demo.git'
+ polling_scm_testing
+
             
+ master
             }
         }
         stage('build'){
@@ -19,8 +22,18 @@ pipeline {
             steps {
                 echo "archiving the artifacts"
                 archiveArtifacts 'MavenProject/multi3/target/*.war'
+ polling_scm_testing
+                
+            }
+            post{
+                success {
+                    emailext body: 'Successfully completed pipeline project with archiving the artifacts', subject: 'Pipeline was successfull', to: 'vathsala.hn22@gmail.com'
+                }
+            }
+
             }
             
+ master
         }
         stage('Deployment') {
             // Deployment
@@ -43,6 +56,11 @@ pipeline {
                 cleanWs()
             }
         }
+ polling_scm_testing
+        
+    }
+}
+
         stage("Metrics"){
             steps{
             parallel ( "JavaNcss Report":   
@@ -71,4 +89,4 @@ pipeline {
 }
         
     }
-}
+}master
