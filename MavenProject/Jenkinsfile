@@ -5,6 +5,10 @@ pipeline {
             steps {
                 echo "checking out the repo"
                 git 'https://github.com/vathsalahn/jenkins-demo.git'
+ polling_scm_testing
+
+            
+ master
             }
         }
         stage('build'){
@@ -18,6 +22,7 @@ pipeline {
             steps {
                 echo "archiving the artifacts"
                 archiveArtifacts 'MavenProject/multi3/target/*.war'
+ polling_scm_testing
                 
             }
             post{
@@ -25,6 +30,10 @@ pipeline {
                     emailext body: 'Successfully completed pipeline project with archiving the artifacts', subject: 'Pipeline was successfull', to: 'vathsala.hn22@gmail.com'
                 }
             }
+
+            }
+            
+ master
         }
         stage('Deployment') {
             // Deployment
@@ -47,6 +56,37 @@ pipeline {
                 cleanWs()
             }
         }
+ polling_scm_testing
         
     }
 }
+
+        stage("Metrics"){
+            steps{
+            parallel ( "JavaNcss Report":   
+            {
+              node('window'){
+                git 'https://github.com/vathsalahn/jenkins-demo.git'
+                sh "cd javancss-master ; mvn test javancss:report ; pwd"
+                  }
+            },
+            "FindBugs Report" : {
+            node('window'){
+                sh "mkdir javancss1 ; cd javancss1 ;pwd"
+                git 'https://github.com/vathsalahn/jenkins-demo.git'
+                sh "cd javancss-master ; mvn findbugs:findbugs ; pwd"
+                deleteDir()
+                }
+
+              }
+         )
+            }
+         post{
+                success {
+                    emailext body: 'Successfully completed pipeline project with archiving the artifacts', subject: 'Pipeline was successfull', to: 'vathsala.hn22@gmail.com'
+                }
+    }
+}
+        
+    }
+}master
