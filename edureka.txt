@@ -1,5 +1,0 @@
-<<<<<<< HEAD
-Hi this is assignment1 for devops class
-
-Hi this is my first assignment
->>>>>>> feature
